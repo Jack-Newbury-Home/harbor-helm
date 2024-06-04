@@ -69,22 +69,6 @@ app: "{{ template "harbor.name" . }}"
   {{- end -}}
 {{- end -}}
 
-{{- define "harbor.autoGenCertForIngress" -}}
-  {{- if and (eq (include "harbor.autoGenCert" .) "true") (eq .Values.expose.type "ingress") -}}
-    {{- printf "true" -}}
-  {{- else -}}
-    {{- printf "false" -}}
-  {{- end -}}
-{{- end -}}
-
-{{- define "harbor.autoGenCertForNginx" -}}
-  {{- if and (eq (include "harbor.autoGenCert" .) "true") (ne .Values.expose.type "ingress") -}}
-    {{- printf "true" -}}
-  {{- else -}}
-    {{- printf "false" -}}
-  {{- end -}}
-{{- end -}}
-
 {{- define "harbor.database.host" -}}
   {{- if eq .Values.database.type "internal" -}}
     {{- template "harbor.database" . }}
@@ -286,10 +270,6 @@ app: "{{ template "harbor.name" . }}"
 
 {{- define "harbor.exporter" -}}
   {{- printf "%s-exporter" (include "harbor.fullname" .) -}}
-{{- end -}}
-
-{{- define "harbor.ingress" -}}
-  {{- printf "%s-ingress" (include "harbor.fullname" .) -}}
 {{- end -}}
 
 {{- define "harbor.noProxy" -}}
@@ -501,16 +481,6 @@ app: "{{ template "harbor.name" . }}"
   {{- end -}}
 {{- end -}}
 
-{{- define "harbor.tlsCoreSecretForIngress" -}}
-  {{- if eq .Values.expose.tls.certSource "none" -}}
-    {{- printf "" -}}
-  {{- else if eq .Values.expose.tls.certSource "secret" -}}
-    {{- .Values.expose.tls.secret.secretName -}}
-  {{- else -}}
-    {{- include "harbor.ingress" . -}}
-  {{- end -}}
-{{- end -}}
-
 {{- define "harbor.tlsSecretForNginx" -}}
   {{- if eq .Values.expose.tls.certSource "secret" -}}
     {{- .Values.expose.tls.secret.secretName -}}
@@ -573,9 +543,4 @@ app: "{{ template "harbor.name" . }}"
   {{- if and .Values.trace.enabled (eq .Values.trace.provider "jaeger") }}
   TRACE_JAEGER_PASSWORD: "{{ .Values.trace.jaeger.password | default "" | b64enc }}"
   {{- end }}
-{{- end -}}
-
-{{/* Allow KubeVersion to be overridden. */}}
-{{- define "harbor.ingress.kubeVersion" -}}
-  {{- default .Capabilities.KubeVersion.Version .Values.expose.ingress.kubeVersionOverride -}}
 {{- end -}}
