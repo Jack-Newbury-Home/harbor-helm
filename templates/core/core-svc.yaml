@@ -9,9 +9,6 @@ metadata:
   {{- toYaml . | nindent 4 }}
 {{- end }}
 spec:
-{{- if or (eq .Values.expose.ingress.controller "gce") (eq .Values.expose.ingress.controller "alb")  (eq .Values.expose.ingress.controller "f5-bigip") }}
-  type: NodePort
-{{- end }}
   ports:
     - name: {{ ternary "https-web" "http-web" .Values.internalTLS.enabled }}
       port: {{ template "harbor.core.servicePort" . }}
